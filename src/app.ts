@@ -28,17 +28,65 @@ const bookSchema = new Schema({
         type: Boolean,
         default: true
     }
-});
+},
+    { timestamps: true }
+);
 
 const Book = model('Book', bookSchema)
 
-app.post('/api/books', async(req: Request, res: Response) => {
+const borrowBookSchema = new Schema({
+    book: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: [1, 'Invalid quantity']
+    },
+    dueDate: {
+        type: Date,
+        required: true
+    }
+});
+
+const BorrowBook = model('BorrowBook', borrowBookSchema)
+
+app.post('/api/books', async (req: Request, res: Response) => {
     const body = req.body;
     const book = await Book.create(body);
     res.status(201).json({
-            success: true,
-            message: "Book created successfully",
-            book
+        success: true,
+        message: "Book created successfully",
+        book
+    })
+})
+
+app.get('/api/books', async (req: Request, res: Response) => {
+
+    const filter = req.query.filter as String;
+    const sortBy = req.query.sortBy as string;
+    const sort = req.query.sort as string;
+    const order = sort === 'asc'? 1 : -1;
+    const limit = req.query.limit || 10;
+
+    // console.log({sortBy, order})
+    // const order
+
+    let query: any = {}
+
+    // console.log(filter);
+
+    if(filter){
+        query.genre = filter
+    }
+
+    const books = await Book.find(query).sort({ [sortBy]: order}).limit(limit);
+
+    res.status(201).json({
+        success: true,
+        message: "Books retrieved successfully",
+        data: books
     })
 })
 
