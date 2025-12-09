@@ -29,7 +29,10 @@ const bookSchema = new Schema({
         default: true
     }
 },
-    { timestamps: true }
+    {
+        versionKey: false,
+        timestamps: true
+    }
 );
 
 const Book = model('Book', bookSchema)
@@ -64,10 +67,10 @@ app.post('/api/books', async (req: Request, res: Response) => {
 
 app.get('/api/books', async (req: Request, res: Response) => {
 
-    const filter = req.query.filter as String;
-    const sortBy = req.query.sortBy as string;
-    const sort = req.query.sort as string;
-    const order = sort === 'asc'? 1 : -1;
+    const filter = req.query.filter;
+    const sortBy = req.query.sortBy;
+    const sort = req.query.sort;
+    const order = sort === 'asc' ? 1 : -1;
     const limit = req.query.limit || 10;
 
     // console.log({sortBy, order})
@@ -77,16 +80,28 @@ app.get('/api/books', async (req: Request, res: Response) => {
 
     // console.log(filter);
 
-    if(filter){
+    if (filter) {
         query.genre = filter
     }
 
-    const books = await Book.find(query).sort({ [sortBy]: order}).limit(limit);
+    const books = await Book.find(query).sort({ [sortBy]: order }).limit(limit);
 
     res.status(201).json({
         success: true,
         message: "Books retrieved successfully",
         data: books
+    })
+})
+
+app.get('/api/books/:bookId', async (req: Request, res: Response) => {
+    const id = req.params.bookId
+    // console.log(id)
+    const book = await Book.findById(id);
+    // console.log(book)
+    res.status(200).json({
+        success: true,
+        message: "Book retrieved successfully",
+        data: book
     })
 })
 
