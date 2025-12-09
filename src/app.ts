@@ -105,6 +105,9 @@ app.get('/api/books/:bookId', async (req: Request, res: Response) => {
     })
 })
 
+
+//update book
+
 app.put('/api/books/:bookId', async (req: Request, res: Response) => {
     const id = req.params.bookId;
     const updatedDoc = req.body;
@@ -119,6 +122,19 @@ app.put('/api/books/:bookId', async (req: Request, res: Response) => {
     })
 })
 
+//delete book
+
+app.delete('/api/books/:bookId', async(req: Request, res: Response)=>{
+    const id = req.params.bookId;
+    // console.log(id)
+    const book = await Book.findByIdAndDelete(id);
+
+    res.status(201).json({
+        success: true,
+        message: "Book deleted successfully",
+        data: null
+    })
+})
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to library management api.')
