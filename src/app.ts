@@ -105,6 +105,21 @@ app.get('/api/books/:bookId', async (req: Request, res: Response) => {
     })
 })
 
+app.put('/api/books/:bookId', async (req: Request, res: Response) => {
+    const id = req.params.bookId;
+    const updatedDoc = req.body;
+    // console.log(id, updatedDoc)
+    // console.log(id)
+    // console.log(updatedDoc)
+    const updateBook = await Book.findByIdAndUpdate(id, updatedDoc, { new: true })
+    res.status(201).json({
+        success: true,
+        message: "Book updated successfully",
+        data: updateBook
+    })
+})
+
+
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to library management api.')
 })
