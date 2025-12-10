@@ -35,6 +35,15 @@ const bookSchema = new Schema({
     }
 );
 
+
+//instance method to update book availability
+bookSchema.methods.updateAvailability = function () {
+    if (this.copies <= 0) {
+        this.available = false;
+    }
+    return this.save();
+};
+
 const Book = model('Book', bookSchema)
 
 const borrowBookSchema = new Schema({
@@ -51,6 +60,9 @@ const borrowBookSchema = new Schema({
         type: Date,
         required: true
     }
+}, {
+    timestamps: true,
+    versionKey: false
 });
 
 const BorrowBook = model('BorrowBook', borrowBookSchema)
@@ -61,8 +73,45 @@ app.post('/api/books', async (req: Request, res: Response) => {
     res.status(201).json({
         success: true,
         message: "Book created successfully",
-        book
+        data: book
     })
+})
+
+app.post('/api/borrow', async (req: Request, res: Response) => {
+
+    const doc = req.body;
+    // console.log(typeof doc)
+    const { book, quantity } = doc;
+    // console.log(book, quantity)
+
+    const bookInfo = await Book.findById(book)
+
+    if (bookInfo === null) return console.log("Invalid")
+
+    console.log(bookInfo?.copies)
+
+    if (bookInfo.copies >= quantity) {
+
+        console.log("Alright.")
+
+        bookInfo.copies = bookInfo.copies - quantity;
+
+        await bookInfo.save();
+    }
+    else {
+        console.log("Sorry! not enough copies.") 
+    }
+
+    await bookInfo.updateAvailability();
+
+    const bookReq = await BorrowBook.create(doc);
+
+    res.status(201).json({
+        success: true,
+        message: "Book borrowed successfully",
+        data: bookReq
+    })
+    
 })
 
 app.get('/api/books', async (req: Request, res: Response) => {
@@ -124,7 +173,7 @@ app.put('/api/books/:bookId', async (req: Request, res: Response) => {
 
 //delete book
 
-app.delete('/api/books/:bookId', async(req: Request, res: Response)=>{
+app.delete('/api/books/:bookId', async (req: Request, res: Response) => {
     const id = req.params.bookId;
     // console.log(id)
     const book = await Book.findByIdAndDelete(id);
