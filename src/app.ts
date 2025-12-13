@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import { model, Schema } from 'mongoose';
 import { Book } from './app/models/book.model';
+import { BorrowBook } from './app/models/borrow.model';
 
 const app: Application = express();
 
@@ -47,26 +48,26 @@ app.use(express.json());
 
 // const Book = model('Book', bookSchema)
 
-const borrowBookSchema = new Schema({
-    book: {
-        type: Schema.Types.ObjectId,
-        required: true
-    },
-    quantity: {
-        type: Number,
-        required: true,
-        min: [1, 'Invalid quantity']
-    },
-    dueDate: {
-        type: Date,
-        required: true
-    }
-}, {
-    timestamps: true,
-    versionKey: false
-});
+// const borrowBookSchema = new Schema({
+//     book: {
+//         type: Schema.Types.ObjectId,
+//         required: true
+//     },
+//     quantity: {
+//         type: Number,
+//         required: true,
+//         min: [1, 'Invalid quantity']
+//     },
+//     dueDate: {
+//         type: Date,
+//         required: true
+//     }
+// }, {
+//     timestamps: true,
+//     versionKey: false
+// });
 
-const BorrowBook = model('BorrowBook', borrowBookSchema)
+// const BorrowBook = model('BorrowBook', borrowBookSchema)
 
 app.post('/api/books', async (req: Request, res: Response) => {
     const body = req.body;

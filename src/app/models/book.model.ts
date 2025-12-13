@@ -38,4 +38,4 @@ bookSchema.methods.updateAvailability = function () {
     return this.save();
 };
 
-export const Book = model('Book', bookSchema);
+export const Book = model<IBook>('Book', bookSchema);
